@@ -1,5 +1,6 @@
 import streamlit as st
 from forex_python.converter import CurrencyRates
+import google.generativeai as genai
 
 st.markdown("""
     <style>
@@ -25,6 +26,12 @@ st.markdown("""
     .sidebar .sidebar-content {
         background-color: #0D47A1;
         color: #FFFFFF;
+    }
+    .footer {
+        text-align: center;
+        padding: 10px;
+        font-size: 0.9em;
+        color: #666666;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -53,7 +60,8 @@ unit_type = st.sidebar.radio(
         "💾 Data Storage Converter",
         "🚗 Speed Converter",
         "📊 Pressure Converter",
-        "⚡ Energy Converter"
+        "⚡ Energy Converter",
+        "🤖 Chatbot"  # Added Chatbot option
     ]
 )
 
@@ -61,12 +69,53 @@ unit_type = st.sidebar.radio(
 if 'history' not in st.session_state:
     st.session_state['history'] = []
 
+# Initialize session state for chatbot
+if 'chat_history' not in st.session_state:
+    st.session_state['chat_history'] = []
+
 # Reusable Conversion Function
 def convert_units(amount, from_unit, to_unit, unit_dict):
     return amount * (unit_dict[to_unit] / unit_dict[from_unit])
 
+# Configure Gemini AI
+try:
+    genai.configure(api_key="AIzaSyBQR4jToPMN-s4B_5_VLCREa8Zwm_Z2pN8") 
+    model = genai.GenerativeModel("gemini-2.0-flash")
+except Exception as e:
+    print(f"Error configuring Gemini AI: {str(e)}")
+
+# Function to chat with Gemini
+def chat_with_gemini(prompt):
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+# Chatbot Section
+if unit_type == "🤖 Chatbot":
+    st.markdown("### 🤖 Chat with Gemini AI")
+    
+    # Input for user prompt
+    user_prompt = st.text_input("Enter your message:")
+    
+    if st.button("Send"):
+        if user_prompt:
+            # Get response from Gemini
+            response = chat_with_gemini(user_prompt)
+            
+            # Save to chat history
+            st.session_state['chat_history'].append(f"You: {user_prompt}")
+            st.session_state['chat_history'].append(f"Gemini: {response}")
+    
+    # Display chat history
+    if st.session_state['chat_history']:
+        st.markdown("### Chat History")
+        for message in st.session_state['chat_history']:
+            st.write(message)
+
 # Length Converter
-if unit_type == "📏 Length Converter":
+elif unit_type == "📏 Length Converter":
     st.markdown("<h2>📏 Length Converter</h2>", unsafe_allow_html=True)
     st.write("Convert between different units of length such as kilometers, meters, centimeters, and more.")
 
