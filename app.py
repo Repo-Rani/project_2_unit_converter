@@ -39,7 +39,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Main Title with a Unique Name
+# Main Title with a Unique Names
 st.markdown(
     """
     <h1 style='text-align: center; font-family: "Georgia", serif; font-size: 2.5em;'>
