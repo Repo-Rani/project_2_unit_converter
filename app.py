@@ -1,6 +1,9 @@
 import streamlit as st
 from forex_python.converter import CurrencyRates
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 st.markdown("""
     <style>
@@ -79,7 +82,7 @@ def convert_units(amount, from_unit, to_unit, unit_dict):
 
 # Configure Gemini AI
 try:
-    genai.configure(api_key="AIzaSyBQR4jToPMN-s4B_5_VLCREa8Zwm_Z2pN8") 
+    genai.configure(api_key=os.getenv("GOOGLE_API_KEY")) 
     model = genai.GenerativeModel("gemini-2.0-flash")
 except Exception as e:
     print(f"Error configuring Gemini AI: {str(e)}")
